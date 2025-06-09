@@ -106,7 +106,7 @@ def generate_ntt_data(N, q, w, w_inv, P, R):
     # Write twiddle factors
     with open("test/W.txt", "w") as f, open("test/WINV.txt", "w") as finv:
         for j in range(int(math.log2(N))):
-            for k in range(max(1, (N//(P*2**j)))):
+            for k in range(max(1, ((N//(P*2))>>j))):
                 for i in range(P):
                     w_pow = (((P<<j)*k + (i<<j)) % (N//2))
                     f.write(f"{hex(((pow(w, w_pow, q) * R) % q))[2:]}\n")
@@ -142,7 +142,7 @@ def generate_intt_data(N, q, w, w_inv, P, R):
     # Write twiddle factors
     with open("test/W.txt", "w") as f, open("test/WINV.txt", "w") as finv:
         for j in range(int(math.log2(N))):
-            for k in range(max(1, (N//(P*2**j)))):
+            for k in range(max(1, ((N//(P*2))>>j))):
                 for i in range(P):
                     w_pow = (((P<<j)*k + (i<<j)) % (N//2))
                     f.write(f"{hex(((pow(w, w_pow, q) * R) % q))[2:]}\n")
