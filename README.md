@@ -25,7 +25,7 @@ This repository provides a comprehensive test environment for Number Theoretic T
 - `NTT.py`: Core NTT implementation with forward and inverse transforms
 - `PrimeGenerator.py`: Utility for generating large prime numbers
 - `Makefile`: Build automation for testing and parameter generation
-- `files/`: Directory containing generated test data and parameters
+- `test/`: Directory containing generated test data and parameters
 
 ## Parameters
 
@@ -126,7 +126,7 @@ pre_defined_params = (N, K, q, psi)  # Replace with your values
 
 ## Generated Files
 
-After running the data generation commands, the following files will be created in the `files/` directory:
+After running the data generation commands, the following files will be created in the `test/` directory:
 
 ### Parameter Generation (`make params`)
 - `PARAM.txt`: Contains all NTT parameters in hexadecimal format
@@ -154,7 +154,7 @@ After running the data generation commands, the following files will be created 
 To run NTT/INTT tests, you need to provide result files that will be compared with the expected outputs:
 
 ### NTT Test (`make ntt-test`)
-- Required file: `files/NTT_RES.txt`
+- Required file: `test/NTT_RES.txt`
   - Contains the NTT results in hexadecimal format
   - One value per line
   - Values should be the final stage results without bit-reversal
@@ -166,7 +166,7 @@ To run NTT/INTT tests, you need to provide result files that will be compared wi
     ```
 
 ### INTT Test (`make intt-test`)
-- Required file: `files/INTT_RES.txt`
+- Required file: `test/INTT_RES.txt`
   - Contains the INTT results in hexadecimal format
   - One value per line
   - Values should be the final stage results without bit-reversal
