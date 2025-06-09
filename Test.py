@@ -27,20 +27,26 @@ def generate_parameters(N, K, P, PC=0, pre_defined_params=None):
         prime_gen = PrimeGenerator()
         while True:
             q = prime_gen.generate_large_prime(K)
-            if (q % (2*N)) == 1:
+            while (not ((q % (2*N)) == 1)):
+                q = prime_gen.generate_large_prime(K)
+            
+            # Generate NTT parameters
+            for i in range(2, q-1):
+                if pow(i, 2*N, q) == 1:
+                    if pow(i, N, q) == (q-1):
+                        pru = [pow(i, x, q) for x in range(1, 2*N)]
+                        if 1 not in pru:
+                            psi = i
+                            break
+                else:
+                    continue
                 break
-        
-        # Generate NTT parameters
-        for i in range(2, q-1):
-            if pow(i, 2*N, q) == 1:
-                if pow(i, N, q) == (q-1):
-                    pru = [pow(i, x, q) for x in range(1, 2*N)]
-                    if 1 not in pru:
-                        psi = i
-                        break
+            else:
+                continue
+            break
     
     # Create NTT instance for parameter calculations
-    ntt = NTT(P=q, W=psi, W_inv=psi)
+    ntt = NTT(P=q, W=0, W_inv=0)
     psi_inv = ntt._modinv(psi, q)
     w = pow(psi, 2, q)
     w_inv = ntt._modinv(w, q)
@@ -51,7 +57,7 @@ def generate_parameters(N, K, P, PC=0, pre_defined_params=None):
     print("-----------------------")
     print("N      : {}".format(N))
     print("K      : {}".format(K))
-    print("P      : {}".format(P))
+    print("PE     : {}".format(P))
     print("q      : {}".format(q))
     print("psi    : {}".format(psi))
     print("psi_inv: {}".format(psi_inv))
@@ -63,16 +69,27 @@ def generate_parameters(N, K, P, PC=0, pre_defined_params=None):
     
     # Write parameters to file
     with open("test/PARAM.txt", "w") as f:
-        f.write(f"{hex(N)[2:].ljust(20)}\n")
-        f.write(f"{hex(K)[2:].ljust(20)}\n")
-        f.write(f"{hex(P)[2:].ljust(20)}\n")
-        f.write(f"{hex(q)[2:].ljust(20)}\n")
-        f.write(f"{hex(psi)[2:].ljust(20)}\n")
-        f.write(f"{hex(psi_inv)[2:].ljust(20)}\n")
-        f.write(f"{hex(w)[2:].ljust(20)}\n")
-        f.write(f"{hex(w_inv)[2:].ljust(20)}\n")
-        f.write(f"{hex((n_inv*R)%q)[2:].ljust(20)}\n")
-        f.write(f"{hex(R)[2:].ljust(20)}\n")
+        f.write(hex(N).replace("L","")[2:].ljust(20)+"\n")
+        f.write(hex(q).replace("L","")[2:].ljust(20)+"\n")
+        f.write(hex(w).replace("L","")[2:].ljust(20)+"\n")
+        f.write(hex(w_inv).replace("L","")[2:].ljust(20)+"\n")
+        f.write(hex(psi).replace("L","")[2:].ljust(20)+"\n")
+        f.write(hex(psi_inv).replace("L","")[2:].ljust(20)+"\n")
+        f.write(hex((n_inv*R)%q).replace("L","")[2:].ljust(20)+"\n")
+        f.write(hex(R).replace("L","")[2:].ljust(20)+"\n")
+        
+        f.write("// Input order:\n")
+        f.write("// N\n")
+        f.write("// q\n")
+        f.write("// w\n")
+        f.write("// w_inv\n")
+        f.write("// psi\n")
+        f.write("// psi_inv\n")
+        f.write("// n_inv\n")
+        f.write("// R\n")
+        f.write("// \n")
+        f.write("// K :"+str(K)+"\n")
+        f.write("// PE:"+str(P)+"\n")
     
     return {"N": N, "K": K, "P": P, "q": q, "psi": psi, "psi_inv": psi_inv, "w": w, "w_inv": w_inv, "n_inv": n_inv, "R": R}
 
@@ -97,20 +114,20 @@ def generate_ntt_data(N, q, w, w_inv, P, R):
     # Write input/output data
     with open("test/NTT_DIN.txt", "w") as f:
         for x in A:
-            f.write(f"{hex(x)[2:]}\n")
+            f.write(hex(x).replace("L","")[2:]+"\n")
     
     with open("test/NTT_DOUT.txt", "w") as f:
         for x in A_ntt:
-            f.write(f"{hex(x)[2:]}\n")
+            f.write(hex(x).replace("L","")[2:]+"\n")
     
     # Write twiddle factors
     with open("test/W.txt", "w") as f, open("test/WINV.txt", "w") as finv:
         for j in range(int(math.log2(N))):
-            for k in range(max(1, ((N//(P*2))>>j))):
+            for k in range(1 if (((N//(P*2))>>j) < 1) else ((N//(P*2))>>j)):
                 for i in range(P):
                     w_pow = (((P<<j)*k + (i<<j)) % (N//2))
-                    f.write(f"{hex(((pow(w, w_pow, q) * R) % q))[2:]}\n")
-                    finv.write(f"{hex(((pow(w_inv, w_pow, q) * R) % q))[2:]}\n")
+                    f.write(hex(((pow(w, w_pow, q) * R) % q)).replace("L","")[2:]+"\n")
+                    finv.write(hex(((pow(w_inv, w_pow, q) * R) % q)).replace("L","")[2:]+"\n")
 
 def generate_intt_data(N, q, w, w_inv, P, R):
     """
@@ -133,20 +150,20 @@ def generate_intt_data(N, q, w, w_inv, P, R):
     # Write input/output data
     with open("test/INTT_DIN.txt", "w") as f:
         for x in A:
-            f.write(f"{hex(x)[2:]}\n")
+            f.write(hex(x).replace("L","")[2:]+"\n")
     
     with open("test/INTT_DOUT.txt", "w") as f:
         for x in A_intt:
-            f.write(f"{hex(x)[2:]}\n")
+            f.write(hex(x).replace("L","")[2:]+"\n")
     
     # Write twiddle factors
     with open("test/W.txt", "w") as f, open("test/WINV.txt", "w") as finv:
         for j in range(int(math.log2(N))):
-            for k in range(max(1, ((N//(P*2))>>j))):
+            for k in range(1 if (((N//(P*2))>>j) < 1) else ((N//(P*2))>>j)):
                 for i in range(P):
                     w_pow = (((P<<j)*k + (i<<j)) % (N//2))
-                    f.write(f"{hex(((pow(w, w_pow, q) * R) % q))[2:]}\n")
-                    finv.write(f"{hex(((pow(w_inv, w_pow, q) * R) % q))[2:]}\n")
+                    f.write(hex(((pow(w, w_pow, q) * R) % q)).replace("L","")[2:]+"\n")
+                    finv.write(hex(((pow(w_inv, w_pow, q) * R) % q)).replace("L","")[2:]+"\n")
 
 def test_ntt_results():
     """
