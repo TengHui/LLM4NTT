@@ -1,6 +1,11 @@
 `timescale 1ns / 1ps
 
-`include "defines.v"
+`define DATA_SIZE_ARB   16
+`define RING_SIZE       1024
+`define PE_NUMBER       8
+`define RING_DEPTH      ($clog2(`RING_SIZE))
+`define PE_DEPTH        ($clog2(`PE_NUMBER))
+
 module NTT_tb();
 
 parameter HP = 10;
