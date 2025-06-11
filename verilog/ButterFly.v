@@ -48,10 +48,9 @@ wire [15:0] ADDreg_next;
 ShiftReg #(.SHIFT(6),.DATA(16)) unit00(clk,reset,ADDreg,ADDreg_next);
 
 always @(*) begin
-    ADDout = ADDreg_next;
-    SUBout = MODout;
-
-    NTToutEVEN = ADDreg_next;
+    ADDout <= ADDreg_next;
+    SUBout <= MODout;
+    NTToutEVEN <= ADDreg_next;
 end
 
 // second level registers (output)
