@@ -33,11 +33,11 @@ reg [`DATA_SIZE_ARB-1:0] ntt_pout  [0:`RING_SIZE-1];
 
 initial begin
 	// ntt
-	$readmemh("test/PARAM.txt"    , params   );
-	$readmemh("test/W.txt"        , w        );
-	$readmemh("test/WINV.txt"     , winv     );
-	$readmemh("test/NTT_DIN.txt"  , ntt_pin  );
-	$readmemh("test/NTT_DOUT.txt" , ntt_pout );
+	$readmemh("../test/PARAM.txt"    , params   );
+	$readmemh("../test/W.txt"        , w        );
+	$readmemh("../test/WINV.txt"     , winv     );
+	$readmemh("../test/NTT_DIN.txt"  , ntt_pin  );
+	$readmemh("../test/NTT_DOUT.txt" , ntt_pout );
 end
 
 // ---------------------------------------------------------------- TEST case
